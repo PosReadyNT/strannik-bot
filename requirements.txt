@@ -117,7 +117,6 @@ tqdm==4.57.0
 typing-extensions==3.7.4.3
 urllib3==1.26.3
 wasabi==0.8.2
-wavelink==0.9.8
 websockets==5.0.1
 Werkzeug==1.0.1
 wikipedia==1.4.0
