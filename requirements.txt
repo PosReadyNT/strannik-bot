@@ -120,7 +120,6 @@ wasabi==0.8.2
 websockets==5.0.1
 Werkzeug==1.0.1
 wikipedia==1.4.0
-WMI==1.5.1
 yarl==1.6.3
 you==0.5.0.dev1
 youtube-dl==2021.2.10
