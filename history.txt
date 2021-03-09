@@ -1,0 +1,91 @@
+
+date:2021-03-03 21:20:13.558000
+Captain Strannik:Позже вырублю, сейчас не до этого...
+date:2021-03-04 17:17:19.504000
+PosReady NT | Dev:s.backup
+date:2021-03-04 17:17:36.591000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:19:41.120000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:19:41.991000
+strannikbot:Ожидайте...
+date:2021-03-04 17:20:25.180000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:20:25.397000
+strannikbot:Ожидайте...
+date:2021-03-04 17:20:55.644000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:22:41.515000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:22:41.819000
+strannikbot:Ожидайте...
+date:2021-03-04 17:23:21.097000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:25:02.079000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:25:02.413000
+strannikbot:Ожидайте...
+date:2021-03-04 17:25:52.534000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:25:52.839000
+strannikbot:Ожидайте...
+date:2021-03-04 17:26:18.696000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:26:18.881000
+strannikbot:Ожидайте...
+date:2021-03-04 17:26:49.436000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:26:49.780000
+strannikbot:Ожидайте...
+date:2021-03-04 17:27:31.557000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:27:31.768000
+strannikbot:Ожидайте...
+date:2021-03-04 17:27:49.084000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:27:49.247000
+strannikbot:Ожидайте...
+date:2021-03-04 17:28:45.005000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:30:36.316000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:34:40.556000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:38:12.181000
+Captain Strannik:s.help
+date:2021-03-04 17:38:13.091000
+strannikbot:
+date:2021-03-04 17:38:26.413000
+Captain Strannik:s.history
+date:2021-03-04 17:39:57.391000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:39:57.532000
+strannikbot:Ожидайте...
+date:2021-03-04 17:40:14.945000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:40:15.139000
+strannikbot:Ожидайте...
+date:2021-03-04 17:40:23.494000
+Captain Strannik:Да хватит уже!!
+date:2021-03-04 17:40:25.830000
+Captain Strannik:XD
+date:2021-03-04 17:41:04.792000
+PosReady NT | Dev:Я тестирую
+date:2021-03-04 17:44:59.032000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:52:18.865000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:52:18.991000
+strannikbot:Ожидайте...
+date:2021-03-04 17:53:20.219000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:53:20.460000
+strannikbot:Ожидайте...
+date:2021-03-04 17:57:09.185000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:57:09.502000
+strannikbot:Ожидайте...
+date:2021-03-04 17:57:24.649000
+PosReady NT | Dev:s.history
+date:2021-03-04 17:57:24.823000
+strannikbot:Ожидайте...

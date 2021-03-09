@@ -1,7 +1,8 @@
 import discord
+import time
 import os
 from discord import Activity, ActivityType
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 class Ready(commands.Cog):
     def __init__(self, bot):
@@ -10,7 +11,8 @@ class Ready(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print("[Bot] - connected")
-        await self.bot.change_presence(status=discord.Status.idle, activity=Activity(name="s.help | strannikbot#3437", type=ActivityType.competing))
+        servers = len(self.bot.guilds)
+        await self.bot.change_presence(status=discord.Status.idle,activity=Activity(name="s.help | strannikbot#3437", type=ActivityType.competing))
         global ia
         global ia2
         ia2 = 0
@@ -29,5 +31,6 @@ class Ready(commands.Cog):
                 os.system(f"rename {filename2} {filename2[:-1]}")
                 ia2 += 1
         print(f"Loaded cogs commands: {ia2}")
+
 def setup(bot):
     bot.add_cog(Ready(bot))

@@ -18,7 +18,7 @@ class Nickname(commands.Cog):
             embed = discord.Embed(title="Ошибка!", description="В дискорде ограничение ника до 32 символов!", colour=discord.Colour.red())
             await ctx.reply(embed=embed)
         else:
-            def isnick():
+            def isnick():# вот тут
                 if member.nick:
                     return f'Изменился ник. Новый никнейм: `{member.nick}`'
                 else:
