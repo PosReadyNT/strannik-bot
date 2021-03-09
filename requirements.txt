@@ -98,8 +98,6 @@ PyScreeze==0.1.26
 PySocks==1.7.1
 PyTweening==1.0.3
 pytz==2017.2
-pywin32==300
-pywin32-ctypes==0.2.0
 qrcode==6.1
 redis==3.5.3
 requests==2.13.0
