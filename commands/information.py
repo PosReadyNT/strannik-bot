@@ -1,5 +1,5 @@
 import json
-
+from pymongo import MongoClient
 import discord
 from hurry.filesize import size
 import platform
@@ -10,6 +10,8 @@ from Cybernator import Paginator
 class Information(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.clust = MongoClient("mongodb+srv://posready:rwju2580@starnnikcluster.btuqa.mongodb.net/posready?retryWrites=true&w=majority")
+        self.bio=self.clust["posready"]["bio"]
 
     @commands.command(description="Посмотреть аватарку пользователя или свою аватарку", usage="<Имя пользователя (не обязательно)>")
     async def avatar(self, ctx, member: discord.Member = None):
@@ -99,18 +101,27 @@ class Information(commands.Cog):
                         desc += f"Играет в: {current_activity.name}\n"
                         desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}"
             return desc
+        def isbio():
+            a = self.bio.find_one({"_id": ctx.author.id})["bio"]
+            if a == 0:
+                return 'Нету'
+            else:
+                return f"{self.bio.find_one({'_id': ctx.author.id})['bio']}"
         if member is None:
-            member = ctx.author
-            embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}', color = member.color)
-            embed.add_field(name="ID Юзера:", value=member.id)
-            embed.add_field(name="Ник на сервере:", value=isnick())
-            embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
-            embed.add_field(name="Бот?", value=isbot())
-            embed.add_field(name="Роли:",value=" ".join(role.mention for role in member.roles[1:]))
-            embed.add_field(name="Высшая роль:",value=member.top_role.mention)
-            embed.add_field(name="Активность:", value=isactivity())
-            embed.add_field(name="Дата получения нитро:", value=isnitro())
-            await ctx.reply(embed=embed)
+            try:
+                member = ctx.author
+                embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}', color = member.color)
+                embed.add_field(name="ID Юзера:", value=member.id)
+                embed.add_field(name="Ник на сервере:", value=isnick())
+                embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
+                embed.add_field(name="Бот?", value=isbot())
+                embed.add_field(name="Роли:",value=" ".join(role.mention for role in member.roles[1:]))
+                embed.add_field(name="Высшая роль:",value=member.top_role.mention)
+                embed.add_field(name="Активность:", value=isactivity())
+                embed.add_field(name="Дата получения нитро:", value=isnitro())
+                await ctx.reply(embed=embed)
+            except:
+                print("error")
         else:
             embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}', color = member.color)
             embed.add_field(name="ID Юзера:", value=member.id)
@@ -321,38 +332,36 @@ class Information(commands.Cog):
             avatar = ctx.guild.icon_url_as(static_format='png', size=1024)
             await ctx.send(file=discord.File(fp=avatar, filename='avatar.png'))
 
-    @commands.command(name='ds',aliases=['status','dstatus'])
-    async def discordstatus(self,ctx):
-        async with ctx.channel.typing():
-            ret = requests.get('https://status.discordapp.com/index.json')
-            rec = json.loads(ret.text)
-            color = 0x000000
-            if rec['status']['description'] == "Все системы в рабочем состоянии":
-                color = 0x00D800
+    @commands.command(description="Изменить/Удалить/Создать биографию", usage="s.bio <rename/delete/create> <текст>")
+    async def bio(self, ctx, arg=None, *args, member: discord.Member = None):
+        if arg is None:
+            await ctx.reply("Введите действие! <rename/delete/create>")
+        if arg == "rename":
+            if member == None:
+                self.bio.update_one({"_id": ctx.author.id}, {"$set": {"bio": " ".join(args)}})
+                embed=discord.Embed(title="Успешно!", description=f"Успешно изменилась биография {ctx.author.name}. Текст биографии: {self.bio.find_one({'_id': ctx.author.id})['bio']}", colour=discord.Colour.green())
+                await ctx.send(embed=embed)
             else:
-                color = 0xAA00AA
-            embed = discord.Embed(title=rec['status']['description'],colour=color,description='Данные получены из [Discord\'s status](https://status.discordapp.com/index.json).')
-            if rec["components"][0]["status"] == "operational":
-                embed.add_field(name="API",value="Отлично",inline=True)
-            else:
-                embed.add_field(name="API",value='Не работает',inline=True)
-            if rec["components"][1]["status"] == "operational":
-                embed.add_field(name="Шлюз",value='Отлично',inline=True)
-            else:
-                embed.add_field(name="Шлюз",value='Не работает',inline=True)
-            if rec["components"][2]["status"] == "operational":
-                embed.add_field(name="CloudFlare",value='Отлично',inline=True)
-            else:
-                embed.add_field(name="CloudFlare",value='Не работает',inline=True)
-            if rec["components"][3]["status"] == "operational":
-                embed.add_field(name="Медиа прокси",value='Отлично',inline=True)
-            else:
-                embed.add_field(name="Шлюз",value='Не работает',inline=True)
-            if rec["components"][3]["status"] == "operational":
-                embed.add_field(name="Голосовые серверы",value='Отлично',inline=True)
-            else:
-                embed.add_field(name="Шлюз",value='Не работает',inline=True)
-        await ctx.send(embed=embed)
+                return
+        elif arg == "delete":
+            if member == None:
+                member = ctx.author
+                self.bio.update_one({"_id": member.id}, {"$set": {"bio": 0}})
+                embed=discord.Embed(title="Успешно!", description=f"Успешно Удалилась биография {ctx.author.name}", colour=discord.Colour.green())
+                await ctx.send(embed=embed)
+        elif arg == "create":
+            def colladd():
+                post = {
+                    "_id": ctx.author.id,
+                    "bio": ""
+                }
+                self.bio.insert_one(post)
+            if member == None:
+                self.bio.delete_one({"_id": ctx.author.id})
+                colladd()
+                self.bio.update_one({"_id": ctx.author.id}, {"$set": {"bio": " ".join(args)}})
+                embed=discord.Embed(title="Успешно!", description=f"Успешно создалась биография {ctx.author.name}. Текст биографии: {self.bio.find_one({'_id': ctx.author.id})['bio']}", colour=discord.Colour.green())
+                await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Information(bot))
