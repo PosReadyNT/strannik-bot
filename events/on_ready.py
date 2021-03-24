@@ -12,7 +12,6 @@ class Ready(commands.Cog):
     async def on_ready(self):
         print("[Bot] - connected")
         servers = len(self.bot.guilds)
-        await self.bot.change_presence(status=discord.Status.idle,activity=Activity(name="s.help | strannikbot#3437", type=ActivityType.competing))
         global ia
         global ia2
         ia2 = 0
@@ -31,6 +30,13 @@ class Ready(commands.Cog):
                 os.system(f"rename {filename2} {filename2[:-1]}")
                 ia2 += 1
         print(f"Loaded cogs commands: {ia2}")
+
+    @tasks.loop(seconds=15)
+    async def change_stat():
+        await self.bot.change_presence(status=discord.Status.idle,activity=Activity(name="s.help | strannikbot#3437", type=ActivityType.competing))
+        time.sleep(15)
+        await self.bot.change_presence(status=discord.Status.idle,activity=Activity(name=f"Я на {len(self.bot.guilds)} серверах", type=ActivityType.watching))
+        time.sleep(15)
 
 def setup(bot):
     bot.add_cog(Ready(bot))

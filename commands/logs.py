@@ -1,11 +1,12 @@
 import discord
 from pymongo import MongoClient
+from config import config as conf
 from discord.ext import commands
 
 class Logs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.clust = MongoClient("mongodb+srv://posready:rwju2580@starnnikcluster.btuqa.mongodb.net/posready?retryWrites=true&w=majority")
+        self.clust = MongoClient(conf["mongo_db"])
         self.dateb=self.clust["posready"]["data"]
     @commands.command()
     @commands.has_permissions(administrator=True)

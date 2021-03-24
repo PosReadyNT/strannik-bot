@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import random
+from config import config as conf
 from datetime import datetime
 from pymongo import MongoClient
 from datetime import datetime
@@ -8,8 +9,11 @@ from datetime import datetime
 class On_member(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.clust = MongoClient("mongodb+srv://posready:rwju2580@starnnikcluster.btuqa.mongodb.net/posready?retryWrites=true&w=majority")
-        self.dateb=self.clust["posready"]["member_join"]
+        self.clust = MongoClient(conf["mongo_db"])
+        self.dateb=self.clust["posready"]["data"]
+        self.member_join=self.clust["posready"]["member_join"]
+        self.member_leave=self.clust["posready"]["member_leave"]
+        self.bios=self.clust["posready"]["bio"]
         self.bot.colors = {
             'WHITE': 0xFFFFFF,
             'AQUA': 0x1ABC9C,
@@ -41,114 +45,76 @@ class On_member(commands.Cog):
                 "_id": ctx.guild.id,
                 "log": 0
             }
-            self.dateb.insert_one(post)
+            self.member_join.insert_one(post)
         if on == "off":
-            if ctx.guild.id == 767096403549487124:
-                self.dateb.update_one({"_id": ctx.guild.id}, {"$set": {"memberj_chan": 0}})
-                embed = discord.Embed(
-                    title = "Приветствие канал", 
-                    description = f"Канал для приветствия участника был отключен", 
-                    color = discord.Color.from_rgb(110, 196, 86)
-                )
-                msg = await ctx.reply(embed=embed)
-                await msg.add_reaction('❌')
-            else:
-                self.dateb.delete_one({"_id": ctx.guild.id})
-                embed = discord.Embed(
-                    title = "Приветствие канал", 
-                    description = f"Канал для приветствия участника был отключен", 
-                    color = discord.Color.from_rgb(110, 196, 86)
-                )
-                msg = await ctx.reply(embed=embed)
-                await msg.add_reaction('❌')
+            self.member_join.delete_one({"_id": ctx.guild.id})
+            embed = discord.Embed(
+                title = "Приветствие канал", 
+                description = f"Канал для приветствия участника был отключен", 
+                color = discord.Color.from_rgb(110, 196, 86)
+            )
+            msg = await ctx.reply(embed=embed)
+            await msg.add_reaction('❌')
         else:
             if channel is None:
                 await ctx.send(embed = discord.Embed(
                     description = f':x:{ctx.author.mention} укажите канал'))
             elif on == "on":
-                if ctx.guild.id == 767096403549487124:
-                    self.dateb.update_one({"_id": ctx.guild.id}, {"$set": {"memberj_chan": channel.id}})
-                        
-                    embed = discord.Embed(
-                        title = "Приветствие канал", 
-                        description = f"Канал для приветствия участника канал был обновлён на: {channel.mention}", 
-                        color = discord.Color.from_rgb(110, 196, 86))
+                colladd()
+                self.member_join.update_one({"_id": ctx.guild.id}, {"$set": {"memberj_chan": channel.id}})
                     
-                    msg = await ctx.reply(embed=embed)
-                    await msg.add_reaction('✅')
-                else:
-                    colladd()
-                    self.dateb.update_one({"_id": ctx.guild.id}, {"$set": {"memberj_chan": channel.id}})
-                        
-                    embed = discord.Embed(
-                        title = "Приветствие канал", 
-                        description = f"Канал для приветствия участника сервера был обновлён на: {channel.mention}", 
-                        color = discord.Color.from_rgb(110, 196, 86))
+                embed = discord.Embed(
+                    title = "Приветствие канал", 
+                    description = f"Канал для приветствия участника сервера был обновлён на: {channel.mention}", 
+                    color = discord.Color.from_rgb(110, 196, 86))
+                
+                msg = await ctx.reply(embed=embed)
+                await msg.add_reaction('✅')
                     
-                    msg = await ctx.reply(embed=embed)
-                    await msg.add_reaction('✅')
 
     @commands.command()
-    @commands.has_permissions(administrator=True)
+    #@commands.has_permissions(administrator=True)
     async def leave_member_channel(self, ctx, on=None, channel: discord.TextChannel=None):
         def colladd():
             post = {
                 "_id": ctx.guild.id,
                 "log": 0
             }
-            self.dateb.insert_one(post)
+            self.member_leave.insert_one(post)
         if on == "off":
-            if ctx.guild.id == 767096403549487124:
-                self.dateb.update_one({"_id": ctx.guild.id}, {"$set": {"memberl_chan": 0}})
-                embed = discord.Embed(
-                    title = "Прощания канал", 
-                    description = f"Канал для прощания участника был отключен", 
-                    color = discord.Color.from_rgb(110, 196, 86)
-                )
-                msg = await ctx.reply(embed=embed)
-                await msg.add_reaction('❌')
-            else:
-                self.dateb.delete_one({"_id": ctx.guild.id})
-                embed = discord.Embed(
-                    title = "Прощания канал", 
-                    description = f"Канал для прощания участника был отключен", 
-                    color = discord.Color.from_rgb(110, 196, 86)
-                )
-                msg = await ctx.reply(embed=embed)
-                await msg.add_reaction('❌')
+            self.member_leave.delete_one({"_id": ctx.guild.id})
+            embed = discord.Embed(
+                title = "Прощания канал", 
+                description = f"Канал для прощания участника был отключен", 
+                color = discord.Color.from_rgb(110, 196, 86)
+            )
+            msg = await ctx.reply(embed=embed)
+            await msg.add_reaction('❌')
         else:
             if channel is None:
                 await ctx.send(embed = discord.Embed(
                     description = f':x:{ctx.author.mention} укажите канал'))
             elif on == "on":
-                if ctx.guild.id == 767096403549487124:
-                    self.dateb.update_one({"_id": ctx.guild.id}, {"$set": {"memberl_chan": channel.id}})
-                        
-                    embed = discord.Embed(
-                        title = "Прощания канал", 
-                        description = f"Канал для прощания участника канал был обновлён на: {channel.mention}", 
-                        color = discord.Color.from_rgb(110, 196, 86))
+                colladd()
+                self.member_leave.update_one({"_id": ctx.guild.id}, {"$set": {"memberl_chan": channel.id}})
                     
-                    msg = await ctx.reply(embed=embed)
-                    await msg.add_reaction('✅')
-                else:
-                    colladd()
-                    self.dateb.update_one({"_id": ctx.guild.id}, {"$set": {"memberl_chan": channel.id}})
-                        
-                    embed = discord.Embed(
-                        title = "Прощания канал", 
-                        description = f"Канал для прощания участника сервера был обновлён на: {channel.mention}", 
-                        color = discord.Color.from_rgb(110, 196, 86))
-                    
-                    msg = await ctx.reply(embed=embed)
-                    await msg.add_reaction('✅')
+                embed = discord.Embed(
+                    title = "Прощания канал", 
+                    description = f"Канал для прощания участника сервера был обновлён на: {channel.mention}", 
+                    color = discord.Color.from_rgb(110, 196, 86))
+                
+                msg = await ctx.reply(embed=embed)
+                await msg.add_reaction('✅')
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        idc = self.dateb.find_one({"_id": member.guild.id})["memberj_chan"]
+        idc = self.member_join.find_one({"_id": member.guild.id})["memberj_chan"]
+        idc_text = self.member_join.find_one({"_id": member.guild.id})["text"]
         if idc == 0:
             return False
+            self.bios.insert_one({"_id": ctx.author.id, "bio": 0})
         else:
+            #if idc_text
             channel = self.bot.get_channel(idc)
             embed = discord.Embed(title='Новый участник',
                                 description=f'Пользователь {member.mention} присоеденился к серверу!',
@@ -157,6 +123,7 @@ class On_member(commands.Cog):
             embed.set_author(name=member.name, icon_url=member.avatar_url)
             embed.set_footer(text=member.guild, icon_url=member.guild.icon_url)
             await channel.send(embed=embed)
+            self.bios.insert_one({"_id": ctx.author.id, "bio": 0})
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
@@ -172,17 +139,10 @@ class On_member(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        idc = self.dateb.find_one({"_id": member.guild.id})["memberl_chan"]
+        idc = self.member_leave.find_one({"_id": member.guild.id})["memberl_chan"]
         if idc == 0:
-            idc = self.dateb.find_one({"_id": member.guild.id})["memberj_chan"]
-            channel = self.bot.get_channel(idc)
-            embed = discord.Embed(title='Выход участника',
-                                  description=f'Пользователь {member.mention} вышёл из сервера. :(',
-                                  color=random.choice(self.bot.color_list))
-            embed.set_thumbnail(url=member.avatar_url)
-            embed.set_author(name=member.name, icon_url=member.avatar_url)
-            embed.set_footer(text=member.guild, icon_url=member.guild.icon_url)
-            await channel.send(embed=embed)
+            return False
+            self.bios.insert_one({"_id": ctx.author.id, "bio": 0})
         else:
             channel = self.bot.get_channel(idc)
             embed = discord.Embed(title='Выход участника',
@@ -192,6 +152,7 @@ class On_member(commands.Cog):
             embed.set_author(name=member.name, icon_url=member.avatar_url)
             embed.set_footer(text=member.guild, icon_url=member.guild.icon_url)
             await channel.send(embed=embed)
+            self.bios.insert_one({"_id": ctx.author.id, "bio": 0})
 
 def setup(bot):
     bot.add_cog(On_member(bot))

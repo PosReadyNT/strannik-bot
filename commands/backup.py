@@ -4,6 +4,7 @@ import os
 import re
 import aiofiles
 import time
+
 import requests
 from discord.ext import commands
 
@@ -14,15 +15,13 @@ class Backup(commands.Cog):
     @commands.command()
     async def backup(self, ctx):
         if ctx.author.id == 694598900094599198 or ctx.author.id == 443484756613660674:
-            z = zipfile.ZipFile('backup.zip', 'w')        # Создание нового архива
-            for root, dirs, files in os.walk('D:/BACKUP/vashnoe/Projects Python/strannikbot'): # Список всех файлов и папок в директории folder
-                for file in files:
-                    z.write(os.path.join(root,file))
-            z.close()
-            await ctx.author.send(file=discord.File(fp='backup.zip', filename='backup.zip'))
+            import py7zr
+            with py7zr.SevenZipFile('backup_bot.7z', 'w') as z:
+                z.writeall('D:/BACKUP/vashnoe/Projects Python/strannikbot')
+            await ctx.author.send(file=discord.File(fp='backup_bot.7z', filename='backup_bot.7z'))
             os.system('cd D:/BACKUP/vashnoe/Projects Python/strannikbot/')
             os.system('D:')
-            os.system("del backup.zip")
+            os.system("del backup_bot.7z")
         else:
             await ctx.reply("Вы не создатель бота!")
 
@@ -62,7 +61,7 @@ class Backup(commands.Cog):
                 messages.reverse()
                 for message in messages:
                     msg2 = await ctx.fetch_message(message.id)
-                    f.write('\ndate:' + str(msg2.created_at))
+                    f.write('\ndate:' + str(msg2.created_at[:19]))
                     f.write('\n' + str(msg2.author.name) + ':' + str(msg2.content))
 
             #messages = await ctx.channel.history(limit=None).flatten()
@@ -91,7 +90,6 @@ class Backup(commands.Cog):
             time.sleep(0.1)
             await ctx.author.send(file=discord.File(fp='D:/BACKUP/vashnoe/Projects Python/strannikbot/history.txt',
                                                     filename=f'channel.txt'))
-
 
 def setup(bot):
     bot.add_cog(Backup(bot))

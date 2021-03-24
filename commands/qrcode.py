@@ -22,7 +22,15 @@ class Qrcode(commands.Cog):
             embed.set_footer(text="©️ strannikbot все права защищены")
             #embed.set_image(url=image_pix)
             await ctx.reply(embed=embed)
-            await ctx.send(file=discord.File(fp=image_pix, filename="qrcode.png"))
+            msg = await ctx.send(file=discord.File(fp=image_pix, filename="qrcode.png"))
+            await msg.add_reaction("🗑️")
+            reaction, user = await self.bot.wait_for("reaction_add",check=lambda reaction,user: user.id == ctx.author.id and str(reaction.emoji) in ["🗑️"] and reaction.message.id == msg.id)
+            if str(reaction.emoji) == "🗑️":
+                #idea_channel = self.bot.get_channel()
+                await msg.clear_reactions()
+                await ctx.message.delete()
+            else:
+                return False
 
 def setup(bot):
     bot.add_cog(Qrcode(bot))

@@ -11,8 +11,6 @@ from Cybernator import Paginator
 class Information(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.clust = MongoClient(conf["mongo_db"])
-        self.bios = self.clust["posready"]["bio"]
 
     @commands.command(description="Посмотреть аватарку пользователя или свою аватарку", usage="<Имя пользователя (не обязательно)>")
     async def avatar(self, ctx, member: discord.Member = None):
@@ -102,15 +100,9 @@ class Information(commands.Cog):
                         desc += f"Играет в: {current_activity.name}\n"
                         desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}"
             return desc
-        def isbio():
-            a = self.bios.find_one({"_id": ctx.author.id})["bio"]
-            if a == 0:
-                return 'Нету'
-            else:
-                return f"{self.bios.find_one({'_id': ctx.author.id})['bio']}"
         if member is None:
             member = ctx.author
-            embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}',description=f"Биография: {isbio()}", color = member.color)
+            embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}', color = member.color)
             embed.add_field(name="ID Юзера:", value=member.id)
             embed.add_field(name="Ник на сервере:", value=isnick())
             embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
@@ -121,7 +113,7 @@ class Information(commands.Cog):
             embed.add_field(name="Дата получения нитро:", value=isnitro())
             await ctx.reply(embed=embed)
         else:
-            embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}',description=f"Биография: {isbio()}", color = member.color)
+            embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}', color = member.color)
             embed.add_field(name="ID Юзера:", value=member.id)
             embed.add_field(name="Ник на сервере:", value=isnick())
             embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
@@ -321,45 +313,6 @@ class Information(commands.Cog):
         message = await ctx.send(embed=embed1)
         page = Paginator(self.bot, message, only=ctx.author, use_more=False, embeds=embeds, footer=False)
         await page.start()
-
-    @commands.command(name='download', description="Скачать что-то", usage="<s.download <icon, banner, splash>>")
-    async def downloads(self, ctx, arg):
-        if arg is None:
-            await ctx.send("Введите аргумент! icon, banner, splash")
-        elif arg == "icon":
-            avatar = ctx.guild.icon_url_as(static_format='png', size=1024)
-            await ctx.send(file=discord.File(fp=avatar, filename='avatar.png'))
-
-    @commands.command(description="Изменить/Удалить/Создать биографию", usage="s.bio <rename/delete/create> <текст>")
-    async def bio(self, ctx, arg=None, *args, member: discord.Member = None):
-        if arg is None:
-            await ctx.reply("Введите действие! <rename/delete/create>")
-        if arg == "rename":
-            if member == None:
-                self.bios.update_one({"_id": ctx.author.id}, {"$set": {"bio": " ".join(args)}})
-                embed=discord.Embed(title="Успешно!", description=f"Успешно изменилась биография {ctx.author.name}. Текст биографии: {self.bios.find_one({'_id': ctx.author.id})['bio']}", colour=discord.Colour.green())
-                await ctx.send(embed=embed)
-            else:
-                return
-        elif arg == "delete":
-            if member == None:
-                member = ctx.author
-                self.bios.update_one({"_id": member.id}, {"$set": {"bio": 0}})
-                embed=discord.Embed(title="Успешно!", description=f"Успешно Удалилась биография {ctx.author.name}", colour=discord.Colour.green())
-                await ctx.send(embed=embed)
-        elif arg == "create":
-            def colladd():
-                post = {
-                    "_id": ctx.author.id,
-                    "bio": ""
-                }
-                self.bios.insert_one(post)
-            if member == None:
-                self.bios.delete_one({"_id": ctx.author.id})
-                colladd()
-                self.bios.update_one({"_id": ctx.author.id}, {"$set": {"bio": " ".join(args)}})
-                embed=discord.Embed(title="Успешно!", description=f"Успешно создалась биография {ctx.author.name}. Текст биографии: {self.bios.find_one({'_id': ctx.author.id})['bio']}", colour=discord.Colour.green())
-                await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Information(bot))

@@ -20,7 +20,7 @@ class Help(commands.Cog):
             else:
                 return 'Доп. информации об команде нету'
         for command in self.bot.commands:
-            embed.add_field(name=f"{prefix}{command.name}", value=f"{iscommanddescription()}, {isusage()}", inline=True)
+            embed.add_field(name=f"{prefix}{command.name}", value=f"{iscommanddescription()}, {isusage()}", inline=False)
         embed.set_footer(text=f"©️ strannikbot все права защищены")
         await ctx.send(embed=embed)
 

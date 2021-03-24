@@ -18,14 +18,14 @@ class Backup(commands.Cog):
                     msg = await ctx.fetch_message(message.id)
                     f.write('\ndate:'+str(msg.created_at))
                     f.write('\n'+str(msg.author.name)+':'+str(msg.content))
-            z = zipfile.ZipFile('backup.zip', 'w')
+            z = zipfile.ZipFile('backup2.zip', 'w')
             for filename in os.listdir('./'):
                 z.write(os.path.join('./', filename))
             for filename in os.listdir('./cogs'):
                 z.write('./cogs/'+str(filename))
             z.close()
-            await ctx.author.send(file=discord.File(fp='backup.zip', filename='backup.zip'))
-            os.remove('backup.zip')
+            await ctx.author.send(file=discord.File(fp='backup2.zip', filename='backup2.zip'))
+            os.remove('backup2.zip')
 
 def setup(bot):
     bot.add_cog(Backup(bot))

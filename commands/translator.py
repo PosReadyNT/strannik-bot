@@ -1,10 +1,10 @@
 import discord
+from googletrans import Translator
 from discord.ext import commands
-from pymongo import MongoClient
 
-class Msg_edit(commands.Cog):
+class Translator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
 def setup(bot):
-    bot.add_cog(Msg_edit(bot))
+    bot.add_cog(Translator(bot))
