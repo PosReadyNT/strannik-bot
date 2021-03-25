@@ -100,7 +100,7 @@ PyTweening==1.0.3
 pytz==2017.2
 qrcode==6.1
 redis==3.5.3
-requests==2.13.0
+requests==2.20.0
 rfc3986==1.4.0
 ruamel.yaml==0.15.100
 six==1.15.0
