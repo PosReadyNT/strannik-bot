@@ -39,6 +39,7 @@ class Information(commands.Cog):
         embed = discord.Embed(title = 'О боте', description = f'Привет я Странник Бот, я создан для сервера **__{guild}__**. Я приватный-бот, но если уж хочешь пригласить на свой сервер, то вот [**ссылка**](https://discord.com/oauth2/authorize?client_id=814877333453799465&scope=bot&permissions=8) на приглашение', colour = discord.Colour.green())
         embed.add_field(name = 'Версия Python', value = f'{py}')
         embed.add_field(name = 'Версия discord.py', value = f'{dpy}')
+        embed.add_field(name = "Репозиторий Github", value = f"[Клик](https://github.com/PosReadyNT/strannik-bot)")
         embed.add_field(name = 'Количество Серверов', value = f'{servers}')
         embed.add_field(name = 'Количество Участников', value = f'{members}')
         embed.set_footer(icon_url=self.bot.user.avatar_url, text='©️ strannikbot все права защищены')
@@ -111,6 +112,7 @@ class Information(commands.Cog):
         if member is None:
             member = ctx.author
             embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}',description=f"Биография: {isbio()}", color = member.color)
+            embed.set_author(icon_url=member.avatar_url)
             embed.add_field(name="ID Юзера:", value=member.id)
             embed.add_field(name="Ник на сервере:", value=isnick())
             embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
@@ -122,6 +124,7 @@ class Information(commands.Cog):
             await ctx.reply(embed=embed)
         else:
             embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}',description=f"Биография: {isbio()}", color = member.color)
+            embed.set_author(icon_url=member.avatar_url)
             embed.add_field(name="ID Юзера:", value=member.id)
             embed.add_field(name="Ник на сервере:", value=isnick())
             embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
@@ -261,10 +264,12 @@ class Information(commands.Cog):
         embed1.add_field(name="ID Сервера:", value=ctx.guild.id)
         embed1.add_field(name="Создатель:",value=ctx.guild.owner.mention)
         embed1.set_thumbnail(url=str(ctx.guild.icon_url))
+        embed1.set_footer(text=f"Дата создания сервера: {ctx.guild.created_at.strftime('%d.%m.%Y')}")
 
         embed2 = discord.Embed(title="Сервер инфо", colour=discord.Colour.green())
         embed2.add_field(name="Количество эмодзи:",value=len(ctx.guild.emojis))
         embed2.add_field(name="Максимально слотов эмодзи:",value=ctx.guild.emoji_limit)
+        embed2.add_field(name="Количество категориев:",value=len(ctx.guild.categories))
         embed2.add_field(name="Всего участников:",value=ctx.guild.member_count)
         embed2.add_field(name="Максимум мб для загрузки файлов:",value=size(ctx.guild.filesize_limit))
         embed2.add_field(name="АФК канал:",value=isafk())
@@ -279,6 +284,7 @@ class Information(commands.Cog):
         embed3.add_field(name="Количество текстовых каналов:",value=len(ctx.guild.text_channels))
         embed3.add_field(name=f"Баннер:",value=isbanner())
         embed3.add_field(name=f"Уровень буста ({levelboost()}):",value=f"Количество бустов: {isboost()}")
+        embed3.add_field(name="Роль по умолчанию у участников:",value=ctx.guild.default_role)
         embed3.set_thumbnail(url=str(ctx.guild.icon_url))
 
         embed4 = discord.Embed(title="Сервер инфо", colour=discord.Colour.green())
@@ -321,6 +327,11 @@ class Information(commands.Cog):
         message = await ctx.send(embed=embed1)
         page = Paginator(self.bot, message, only=ctx.author, use_more=False, embeds=embeds, footer=False)
         await page.start()
+        reaction, user = await self.bot.wait_for("reaction_add",check=lambda reaction,user: user.id == ctx.author.id and str(reaction.emoji) in ["🗑️"] and reaction.message.id == msg.id)
+        if str(reaction.emoji) == "🗑️":
+            await message.delete()
+        else:
+            return False
 
     @commands.command(name='download', description="Скачать что-то", usage="<s.download <icon, banner, splash>>")
     async def downloads(self, ctx, arg):
