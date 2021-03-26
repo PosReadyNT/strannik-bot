@@ -327,11 +327,6 @@ class Information(commands.Cog):
         message = await ctx.send(embed=embed1)
         page = Paginator(self.bot, message, only=ctx.author, use_more=False, embeds=embeds, footer=False)
         await page.start()
-        reaction, user = await self.bot.wait_for("reaction_add",check=lambda reaction,user: user.id == ctx.author.id and str(reaction.emoji) in ["🗑️"] and reaction.message.id == msg.id)
-        if str(reaction.emoji) == "🗑️":
-            await message.delete()
-        else:
-            return False
 
     @commands.command(name='download', description="Скачать что-то", usage="<s.download <icon, banner, splash>>")
     async def downloads(self, ctx, arg):
