@@ -61,7 +61,7 @@ class Backup(commands.Cog):
                 messages.reverse()
                 for message in messages:
                     msg2 = await ctx.fetch_message(message.id)
-                    f.write('\ndate:' + str(msg2.created_at[:19]))
+                    f.write('\ndate:' + msg2.created_at[:19])
                     f.write('\n' + str(msg2.author.name) + ':' + str(msg2.content))
 
             #messages = await ctx.channel.history(limit=None).flatten()

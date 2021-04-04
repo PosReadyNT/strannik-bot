@@ -1,6 +1,8 @@
 import discord
 import aiohttp
 import requests
+import random
+import datetime
 from bs4 import BeautifulSoup
 import asyncio
 from PIL import Image
@@ -20,6 +22,7 @@ class Testing(commands.Cog):
         await ctx.send(f"msg: {counter}")
 
     @commands.command()
+    @commands.is_owner()
     async def meme(self, ctx):
         embed = discord.Embed(title="test", description="test")
 
@@ -39,26 +42,6 @@ class Testing(commands.Cog):
         win = await self.bot.get_channel(chan).fetch_message(msg)
         import random
         await ctx.send(f"winner: {random.choice(win)}")
-
-    @commands.command()
-    async def test2(self, ctx, member: discord.Member = None):
-        def pixel_img(image, pixel_size=8):
-            image = image.resize((image.size[0] // pixel_size, image.size[1] // pixel_size), Image.NEAREST)
-            image = image.resize((image.size[0] * pixel_size, image.size[1] * pixel_size), Image.NEAREST)  
-            return image
-        if member is None:
-            member = ctx.author
-            image = pixel_img(Image.open(BytesIO(await member.avatar_url_as(format='png').read())).convert('RGBA'))
-            output = BytesIO()
-            image.save(output, 'png')
-            image_pix=BytesIO(output.getvalue())
-            await ctx.send(file=discord.File(fp=image_pix, filename='pix_ava.png'))
-        else:
-            image = pixel_img(Image.open(BytesIO(await member.avatar_url_as(format='png').read())).convert('RGBA'))
-            output = BytesIO()
-            image.save(output, 'png')
-            image_pix=BytesIO(output.getvalue())
-            await ctx.send(file=discord.File(fp=image_pix, filename='pix_ava.png'))
 
     @commands.command()
     async def google(self, ctx, *, question = None):
@@ -101,6 +84,7 @@ class Testing(commands.Cog):
             emb.set_author(name = '{}'.format(ctx.author), icon_url = '{}'.format(ctx.author.avatar_url))
             await ctx.send(embed = emb)
 
+            
     @commands.command()
     async def переводчик_3(self, ctx,*,message=None):
         a = {"q":"й","w":"ц","e":"у","r":"к","t":"е","y":"н","u":"г","i":"ш","o":"щ","p":"з","[":"х","{":"х","}":"ъ","]":"ъ","a":"ф","s":"ы","d":"в","f":"а","g":"п","h":"р","j":"о","k":"л","l":"д",":":"ж",";":"ж",'"':"э","'":"э","z":"я","x":"ч","c":"с","v":"м","b":"и","n":"т","m":"ь","<":"б",",":"б",">":"ю",".":"ю","?":",","/":".","`":"ё","~":"ё"," ":" "}
@@ -124,6 +108,35 @@ class Testing(commands.Cog):
             else:
                 itog_new=f"Перевод: {itog}"
                 await ctx.send(f"{itog_new}{errors_itog}")
+
+    @commands.command()
+    #@commands.has_role()
+    async def g(self, ctx, mins : int, * , prize: str):
+        embed = discord.Embed(title = "Розыгрыш!", description = f"{prize}", color = ctx.author.color)
+
+        end = datetime.datetime.utcnow() + datetime.timedelta(seconds = mins*60)
+
+        embed.add_field(name = "Заканчивается в:", value = f"{end[:19]} UTC")
+        embed.set_footer(text = f"Заканчивается через {mins} минут с данного времени!")
+
+        my_msg = await ctx.send(embed = embed)
+
+
+        await my_msg.add_reaction("🎉")
+
+
+        await asyncio.sleep(mins*60)
+
+
+        new_msg = await ctx.channel.fetch_message(my_msg.id)
+
+
+        users = await new_msg.reactions[0].users().flatten()
+        users.pop(users.index(self.bot.user))
+
+        winner = random.choice(users)
+
+        await ctx.send(f"Поздравления! {winner.mention} выиграл {prize}!")
 
 def setup(bot):
     bot.add_cog(Testing(bot))

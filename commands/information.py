@@ -4,6 +4,7 @@ import discord
 from config import config as conf
 from hurry.filesize import size
 import platform
+import datetime
 import requests
 from discord.ext import commands
 from Cybernator import Paginator
@@ -40,10 +41,43 @@ class Information(commands.Cog):
         embed.add_field(name = 'Версия Python', value = f'{py}')
         embed.add_field(name = 'Версия discord.py', value = f'{dpy}')
         embed.add_field(name = "Репозиторий Github", value = f"[Клик](https://github.com/PosReadyNT/strannik-bot)")
+        embed.add_field(name = "Помощь в создании", value=f'Stackoverflow\nPosReady#3307')
         embed.add_field(name = 'Количество Серверов', value = f'{servers}')
         embed.add_field(name = 'Количество Участников', value = f'{members}')
         embed.set_footer(icon_url=self.bot.user.avatar_url, text='©️ strannikbot все права защищены')
         await ctx.send(embed=embed)
+
+    @commands.command()
+    async def reg_all_bio(self, ctx, guilds: discord.Guild = None):
+        if ctx.author.id == 694598900094599198 or ctx.author.id == 443484756613660674:
+            if guilds is None:
+                for membr in ctx.guild.members:
+                    def colladd():
+                        post = {
+                            "_id": membr.id,
+                            "server": ctx.guild.id,
+                            "bio": ""
+                        }
+                        self.bios.insert_one(post)
+                    self.bios.delete_one({"_id": membr.id})
+                    colladd()
+                    self.bios.update_one({"_id": membr.id, "server": ctx.guild.id}, {"$set": {"bio": 0}})
+                await ctx.send("Успешно!")
+            else:
+                for membr in guilds.members:
+                    def colladd():
+                        post = {
+                            "_id": membr.id,
+                            "server": guilds.id,
+                            "bio": ""
+                        }
+                        self.bios.insert_one(post)
+                    self.bios.delete_one({"_id": membr.id})
+                    colladd()
+                    self.bios.update_one({"_id": membr.id, "server": guilds.id}, {"$set": {"bio": 0}})
+                await ctx.send("Успешно!")
+        else:
+            await ctx.send("Вы не создатель бота!")
 
     @commands.command(aliases=["user", "u_i", "info", "юзер", "ю_и", "инфо"], description="Информация о пользователе или о себе", usage="<Имя пользователя (не обязательно)>")
     async def user_info(self, ctx, member: discord.Member = None):
@@ -73,67 +107,111 @@ class Information(commands.Cog):
                 if current_activity.type:        
                     if current_activity.type == discord.ActivityType.playing:
                         desc += "Тип активности: Игра\n"
-                        desc += f"Название: {current_activity.name}\n"
-                        desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}\n"
+                        desc += f"Название: **{current_activity.name}**\n"
+                        if current_activity.details:
+                            desc += f"Детали: **{current_activity.details}**\n"
+                        if current_activity.large_image_url:
+                            if current_activity.large_image_text:
+                                desc += f"[Большая картинка]({current_activity.large_image_url})\n"
+                                desc += f"Текст большой картинки: **{current_activity.large_image_text}**\n"
+                            else:
+                                desc += f"[Большая картинка]({current_activity.large_image_url})\n"
+                        if current_activity.small_image_url:
+                            if current_activity.small_image_text:
+                                desc += f"[Маленькая картинка:]({current_activity.small_image_url})\n"
+                                desc += f"Текст маленькой картинки: **{current_activity.small_image_text}**\n"
+                            else:
+                                desc += f"[Маленькая картинка:]({current_activity.small_image_url})\n"
+                        desc += f"Создано: **{current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}**\n"
 			            #desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}\n"
                     elif current_activity.type == discord.ActivityType.listening and not isinstance(current_activity, discord.Spotify):
                         desc += "Тип активности: Музыка\n"
-                        desc += f"Слушает: {current_activity.name}\n"
-                        desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}"
+                        desc += f"Слушает: **{current_activity.name}**\n"
+                        desc += f"Создано: **{current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}**"
 			            #desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}"
                     elif current_activity.type == discord.ActivityType.listening and isinstance(current_activity, discord.Spotify):
                         desc += "Тип активности: Spotify\n"
-                        desc += f"Название трека: {current_activity.title}\n"
-                        desc += f"Название альбома: {current_activity.album}\n"
-                        desc += f"Артисты: {', '.join(current_activity.artists)}\n"
+                        desc += f"Название трека: **{current_activity.title}**\n"
+                        desc += f"Название альбома: **{current_activity.album}**\n"
+                        desc += f"Артисты: **{', '.join(current_activity.artists)}**\n"
                         total_seconds = current_activity.duration.seconds
                         hours = total_seconds // 3600
                         minutes = (total_seconds - hours * 3600) // 60
                         seconds = total_seconds - (hours * 3600 + minutes * 60)
-                        desc += f"Продолжительность трека: {hours if str(hours) != '0' else '00'}:{minutes if str(minutes) != '0' else '00'}:{seconds if str(seconds) != '0' else '00'}\n"
+                        desc += f"Продолжительность трека: **{hours if str(hours) != '0' else '00'}:{minutes if str(minutes) != '0' else '00'}:{seconds if str(seconds) != '0' else '00'}**\n"
 
                     elif current_activity.type == discord.ActivityType.watching:
                         desc += "Тип активности: Просмотр\n"
-                        desc += f"Смотрит: {current_activity.name}\n"
+                        desc += f"Смотрит: **{current_activity.name}**\n"
 			            #desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}"
-                        desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}"
+                        desc += f"Создано: **{current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}**"
 
                     else:
                         desc += "Тип активности: Кастом\n"
-                        desc += f"Играет в: {current_activity.name}\n"
-                        desc += f"Создано: {current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}"
+                        if current_activity.emoji:
+                            desc += f"Играет в: **{current_activity.emoji} {current_activity.name}**\n"
+                        else:
+                            desc += f"Играет в: **{current_activity.name}**\n"
+                        desc += f"Создано: **{current_activity.created_at.strftime('%d-%m-%Y %H:%M:%S')}**"
             return desc
-        def isbio():
+        def isbio1():
             a = self.bios.find_one({"_id": ctx.author.id})["bio"]
             if a == 0:
                 return 'Нету'
             else:
                 return f"{self.bios.find_one({'_id': ctx.author.id})['bio']}"
+        def isbio2():
+            b = self.bios.find_one({"_id": member.id})["bio"]
+            if b == 0:
+                return 'Нету'
+            else:
+                return f"{self.bios.find_one({'_id': member.id})['bio']}"             
         if member is None:
             member = ctx.author
-            embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}',description=f"Биография: {isbio()}", color = member.color)
-            embed.set_author(icon_url=member.avatar_url)
-            embed.add_field(name="ID Юзера:", value=member.id)
-            embed.add_field(name="Ник на сервере:", value=isnick())
-            embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
-            embed.add_field(name="Бот?", value=isbot())
-            embed.add_field(name="Роли", value=f" ".join([role.mention for role in member.roles[1:]]))
-            embed.add_field(name="Высшая роль:",value=member.top_role.mention)
-            embed.add_field(name="Активность:", value=isactivity())
-            embed.add_field(name="Дата получения нитро:", value=isnitro())
-            await ctx.reply(embed=embed)
+            if member in ctx.guild.members:
+                embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}',description=f"Биография: {isbio1()}", color = member.color)
+                embed.set_author(name=member.name, icon_url=member.avatar_url)
+                embed.add_field(name="ID Юзера:", value=member.id)
+                embed.add_field(name="Ник на сервере:", value=isnick())
+                embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
+                embed.add_field(name="Создан в дискорд:", value=member.created_at.strftime("%d/%m/%Y"))
+                embed.add_field(name="Бот?", value=isbot())
+                embed.add_field(name="Роли", value=f" ".join([role.mention for role in member.roles[1:]]))
+                embed.add_field(name="Высшая роль:",value=member.top_role.mention)
+                embed.add_field(name="Активность:", value=isactivity())
+                embed.add_field(name="Дата получения нитро:", value=isnitro())
+                await ctx.reply(embed=embed)
         else:
-            embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}',description=f"Биография: {isbio()}", color = member.color)
-            embed.set_author(icon_url=member.avatar_url)
-            embed.add_field(name="ID Юзера:", value=member.id)
-            embed.add_field(name="Ник на сервере:", value=isnick())
-            embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
-            embed.add_field(name="Бот?", value=isbot())
-            embed.add_field(name="Роли:", value=f" ".join([role.mention for role in member.roles[1:]]))
-            embed.add_field(name="Высшая роль:",value=member.top_role.mention)
-            embed.add_field(name="Активность:", value=isactivity())
-            embed.add_field(name="Дата получения нитро:", value=isnitro())
-            await ctx.reply(embed=embed)
+            if member in ctx.guild.members:
+                embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}',description=f"Биография: {isbio2()}", color = member.color)
+                embed.set_author(name=member.name, icon_url=member.avatar_url)
+                embed.add_field(name="ID Юзера:", value=member.id)
+                embed.add_field(name="Ник на сервере:", value=isnick())
+                embed.add_field(name="Присоеденился на сервер:", value=member.joined_at.strftime("%d/%m/%Y"))
+                embed.add_field(name="Создан в дискорд:", value=member.created_at.strftime("%d/%m/%Y"))
+                embed.add_field(name="Бот?", value=isbot())
+                embed.add_field(name="Роли:", value=f" ".join([role.mention for role in member.roles[1:]]))
+                embed.add_field(name="Высшая роль:",value=member.top_role.mention)
+                embed.add_field(name="Активность:", value=isactivity())
+                embed.add_field(name="Дата получения нитро:", value=isnitro())
+                await ctx.reply(embed=embed)
+            else:
+                member = await self.bot.fetch_user(member.id)
+                embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}', color = member.color)
+                embed.set_author(name=member.name, icon_url=member.avatar_url)
+                embed.add_field(name="ID Юзера:", value=member.id)
+                embed.add_field(name="Создан в дискорд:", value=member.created_at.strftime("%d/%m/%Y"))
+                embed.add_field(name="Бот?", value=isbot())
+                await ctx.reply(embed=embed)
+
+    @commands.command()
+    async def glob_user_info(self, ctx, member: discord.User):
+        member = await self.bot.fetch_user(member.id)
+        embed = discord.Embed(title = f'Информация о {member.name}#{member.discriminator}', color = member.color)
+        embed.set_author(name=member.name, icon_url=member.avatar_url)
+        embed.add_field(name="ID Юзера:", value=member.id)
+        embed.add_field(name="Создан в дискорд:", value=member.created_at.strftime("%d/%m/%Y"))
+        await ctx.reply(embed=embed)
 
     @commands.command(aliases=["serverinfo", "infoserver", "серверинфо", "сервер", "инфосервер"], description="Информация о сервере", usage="<s.server>")
     async def server(self, ctx):
@@ -342,7 +420,7 @@ class Information(commands.Cog):
             await ctx.reply("Введите действие! <rename/delete/create>")
         if arg == "rename":
             if member == None:
-                self.bios.update_one({"_id": ctx.author.id}, {"$set": {"bio": " ".join(args)}})
+                self.bios.update_one({"_id": ctx.author.id, "server": ctx.guild.id}, {"$set": {"bio": " ".join(args)}})
                 embed=discord.Embed(title="Успешно!", description=f"Успешно изменилась биография {ctx.author.name}. Текст биографии: {self.bios.find_one({'_id': ctx.author.id})['bio']}", colour=discord.Colour.green())
                 await ctx.send(embed=embed)
             else:
@@ -350,20 +428,21 @@ class Information(commands.Cog):
         elif arg == "delete":
             if member == None:
                 member = ctx.author
-                self.bios.update_one({"_id": member.id}, {"$set": {"bio": 0}})
+                self.bios.update_one({"_id": member.id, "server": ctx.guild.id}, {"$set": {"bio": 0}})
                 embed=discord.Embed(title="Успешно!", description=f"Успешно Удалилась биография {ctx.author.name}", colour=discord.Colour.green())
                 await ctx.send(embed=embed)
         elif arg == "create":
             def colladd():
                 post = {
                     "_id": ctx.author.id,
+                    "server": ctx.guild.id,
                     "bio": ""
                 }
                 self.bios.insert_one(post)
             if member == None:
                 self.bios.delete_one({"_id": ctx.author.id})
                 colladd()
-                self.bios.update_one({"_id": ctx.author.id}, {"$set": {"bio": " ".join(args)}})
+                self.bios.update_one({"_id": ctx.author.id, "server": ctx.guild.id}, {"$set": {"bio": " ".join(args)}})
                 embed=discord.Embed(title="Успешно!", description=f"Успешно создалась биография {ctx.author.name}. Текст биографии: {self.bios.find_one({'_id': ctx.author.id})['bio']}", colour=discord.Colour.green())
                 await ctx.send(embed=embed)
 

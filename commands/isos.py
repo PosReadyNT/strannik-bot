@@ -8,12 +8,8 @@ class Isos(commands.Cog):
 
     @commands.command(description="Выбор скачивания архива из mega", usage="s.link <mega> <Leaked source <info on a command>>")
     async def link(self, ctx, *args):
-        mega = Mega()
-        m = bool(mega.login("artemblet535@gmail.com", "rwju2580@"))
-        if m == True:
-            print("OK")
-        else:
-            print("NOT OK")
+        #code
+        pass
 
 def setup(bot):
     bot.add_cog(Isos(bot))
